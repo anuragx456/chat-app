@@ -47,9 +47,7 @@ const SignUpScreen = () => {
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: Colors.background}}>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-                <ScrollView contentContainerStyle={{flexGrow: 1, justifyContent:"center", padding: 24}} 
-                keyboardShouldPersistTaps="handled"
-                >
+                <ScrollView contentContainerStyle={{flexGrow: 1, justifyContent:"center", padding: 24}} keyboardShouldPersistTaps="handled">
                 <View style={{ alignItems: "center", marginBottom: 48 }}>
                     <View style={{
                         width: 72,

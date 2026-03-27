@@ -17,6 +17,6 @@ app.get('/', (req, res) => {
     res.send("Hello from backend");
 })
 
-app.listen(3000, () => {
-    console.log("Server is running at http://localhost:3000");
+app.listen(3000, "0.0.0.0", () => {
+    console.log("Server is running at http://0.0.0.0:3000");
 })

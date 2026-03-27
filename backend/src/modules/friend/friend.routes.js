@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../../lib/require-auth.js";
+import { discover, listFriends, sendRequest } from "./friend.controller.js";
 
 
 export const friendRouter = Router();

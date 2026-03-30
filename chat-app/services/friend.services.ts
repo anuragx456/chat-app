@@ -4,7 +4,7 @@ import { methods } from "better-auth/react";
 
 const API_URL = "http://10.71.115.59:3000/api";
 
-async function getHeaders() {
+async function getHeaders(): Promise<Record<string, string>> {
     const cookie = authClient.getCookie?.() ?? "";
     return {
         "Content-Type": "application/json",
@@ -26,14 +26,15 @@ export const friendService = {
     },
     discoverUsers: async (search: string = "") => {
         const headers = await getHeaders();
-        const url = `${API_URL}/friend/discover?search=${encodeURIComponent(search)}`;
-        
+        const baseUrl = `${API_URL}/friend/discover`;
+        const url = search ? `${baseUrl}?search=${encodeURIComponent(search)}` : baseUrl;
+
         try {
             const res = await fetch(url, {
                 method: "GET",
                 headers
             });
-            
+
             if(!res.ok){
                 const text = await res.text();
                 console.error("Discover users failed:", res.status, res.statusText, text);
@@ -56,5 +57,56 @@ export const friendService = {
         const data = await res.json();
         if(!res.ok) throw new Error(data.message || "Failed to send request");
         return data;
+    },
+    acceptFriendRequest: async (requestId: string) => {
+        const headers = await getHeaders();
+        const res = await fetch(`${API_URL}/friend/request/id/${requestId}/accept`, {
+            method: "POST",
+            headers,
+        })
+        let data;
+        try {
+            data = await res.clone().json()
+        } catch (error) {
+            data = await res.json()
+        }
+
+        if(!res.ok) throw new Error(data.message || "Failed to accept request")
+            
+            return data;
+    },
+    rejectFriendRequest: async (requestId: string) => {
+        const headers = await getHeaders();
+        const res = await fetch(`${API_URL}/friend/request/id/${requestId}/reject`, {
+            method: "POST",
+            headers,
+        })
+        let data;
+        try {
+            data = await res.clone().json()
+        } catch (error) {
+            data = await res.json()
+        }
+
+        if(!res.ok) throw new Error(data.message || "Failed to reject request")
+            
+            return data;
+    },
+    cancelFriendRequest: async (requestId: string) => {
+        const headers = await getHeaders();
+        const res = await fetch(`${API_URL}/friend/request/id/${requestId}/cancel`, {
+            method: "POST",
+            headers,
+        })
+        let data;
+        try {
+            data = await res.clone().json()
+        } catch (error) {
+            data = await res.json()
+        }
+
+        if(!res.ok) throw new Error(data.message || "Failed to cancel request")
+            
+            return data;
     },
 };

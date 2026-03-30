@@ -1,4 +1,5 @@
 import { authClient } from "@/utils/auth-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { AuthClient } from "better-auth/client";
 import React, {createContext, useContext} from "react";
 
@@ -35,6 +36,8 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({children} : {children:React.ReactNode}){
+
+    
 
     const {data, error, isPending} = authClient.useSession()
 

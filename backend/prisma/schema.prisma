@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,35 +7,55 @@ datasource db {
 }
 
 model Test {
-  id          String @default(cuid()) @id
+  id          String @id @default(cuid())
   name        String
   description String
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id                     String          @id
+  name                   String
+  email                  String          @unique
+  emailVerified          Boolean         @default(false)
+  image                  String?
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  pushToken              String?
+  friends                Friend[]        @relation("Friends1")
+  friendsOf              Friend[]        @relation("Friends2")
+  friendRequestsReceived FriendRequest[] @relation("FriendRequestsReceived")
+  friendRequestsSent     FriendRequest[] @relation("FriendRequestsSent")
+  accounts               Account[]
+  messagesReceived       Message[]       @relation("MessageReceived")
+  messagesSent           Message[]       @relation("MessageSent")
+  messages               Message[]       @relation("UserMessages")
+  sessions               Session[]
 
-  friendRequestsSent      FriendRequest[]   @relation("FriendRequestsSent")
-  friendRequestsReceived  FriendRequest[]   @relation("FriendRequestsReceived")
-  friends                 Friend[]    @relation("Friends1")
-  friendsOf               Friend[]    @relation("Friends2")
-
-  @@unique([email])
   @@map("user")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  senderId   String
+  receiverId String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String?
+  receiver   User     @relation("MessageReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User     @relation("MessageSent", fields: [senderId], references: [id], onDelete: Cascade)
+  user       User?    @relation("UserMessages", fields: [userId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@map("message")
 }
 
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -48,7 +63,6 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@index([userId])
   @@map("session")
 }
@@ -58,7 +72,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -68,6 +81,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("account")
@@ -86,42 +100,33 @@ model Verification {
 }
 
 model FriendRequest {
-  id            String      @id         @default(cuid())
-
-  senderId      String
-  receiverId    String
-
-  sender        User      @relation("FriendRequestsSent", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver      User      @relation("FriendRequestsReceived", fields: [receiverId], references: [id], onDelete: Cascade)
-
-  status        FriendRequestStatus     @default(PENDING)
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id         String              @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     FriendRequestStatus @default(PENDING)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  receiver   User                @relation("FriendRequestsReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User                @relation("FriendRequestsSent", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@unique([senderId, receiverId])
   @@index([receiverId])
   @@index([senderId])
 }
 
-
 model Friend {
-  id    String    @id   @default(cuid())
-
+  id        String   @id @default(cuid())
   userId1   String
   userId2   String
-
-  user1        User      @relation("Friends1", fields: [userId1], references: [id], onDelete: Cascade)
-  user2        User      @relation("Friends2", fields: [userId2], references: [id], onDelete: Cascade)
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user1     User     @relation("Friends1", fields: [userId1], references: [id], onDelete: Cascade)
+  user2     User     @relation("Friends2", fields: [userId2], references: [id], onDelete: Cascade)
 
   @@unique([userId1, userId2])
   @@index([userId1])
   @@index([userId2])
 }
-
 
 enum FriendRequestStatus {
   PENDING

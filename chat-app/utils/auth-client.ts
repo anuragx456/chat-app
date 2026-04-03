@@ -1,9 +1,12 @@
 import { createAuthClient } from "better-auth/react";
 import { expoClient } from "@better-auth/expo/client";
 import * as SecureStore from "expo-secure-store";
+import { API_URL } from ".";
+
+console.log("Auth client initializing with baseURL:", API_URL);
 
 export const authClient = createAuthClient({
-    baseURL: "http://10.71.115.59:3000", // Base URL of your Better Auth backend.
+    baseURL: `${API_URL}/auth`, // Points to /api/auth
     plugins: [
         expoClient({
             scheme: "chatapp",
@@ -11,4 +14,6 @@ export const authClient = createAuthClient({
             storage: SecureStore,
         })
     ]
-})
+});
+
+console.log("Auth client created successfully");

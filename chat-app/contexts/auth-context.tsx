@@ -55,17 +55,22 @@ export function AuthProvider({children} : {children:React.ReactNode}){
 
     const signIn = async(email: string, password: string):Promise<string | null> => {
         try {
+            console.log("Attempting sign-in with email:", email);
             const {data, error} = await authClient.signIn.email({
-                email, 
+                email,
                 password
             });
 
+            console.log("Sign-in response:", { data, error });
+
             if (error) {
-                return error.message ?? "Sign In failed";
+                console.log("Sign-in error object:", JSON.stringify(error, null, 2));
+                return error.message || error.code || "Sign In failed";
             }
             return null;
-        } catch (error) {
-            return "Sign In failed";
+        } catch (err: any) {
+            console.error("Sign-in exception:", err);
+            return err?.message || err?.code || "Sign In failed";
         }
     }
 

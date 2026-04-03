@@ -1,8 +1,8 @@
+import { API_URL } from "@/utils";
 import { authClient } from "@/utils/auth-client";
 import { methods } from "better-auth/react";
 
 
-const API_URL = "http://10.71.115.59:3000/api";
 
 async function getHeaders(): Promise<Record<string, string>> {
     const cookie = authClient.getCookie?.() ?? "";

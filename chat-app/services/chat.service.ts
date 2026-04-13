@@ -34,9 +34,9 @@ export const chatService = {
             body: JSON.stringify({receiverId, content})
         });
 
-        const data = await res.clone().json();
+        const data = await safelyParseJson(res);
 
-        if(!res.ok) throw new Error("Failed to send Message");
+        if(!res.ok) throw new Error(data.message || "Failed to send Message");
 
         return data;
     },
@@ -57,9 +57,9 @@ export const chatService = {
             headers
         })
 
-        const data = await res.clone().json();
+        const data = await safelyParseJson(res);
 
-        if(!res.ok) throw new Error("Failed to fetch Messages");
+        if(!res.ok) throw new Error(data.message || "Failed to fetch Messages");
 
         return data;
     },
@@ -70,7 +70,7 @@ export const chatService = {
             headers
         })
 
-        const data = await res.clone().json();
+        const data = await safelyParseJson(res);
 
         if(!res.ok) throw new Error("Failed to fetch conversations");
 
@@ -84,10 +84,19 @@ export const chatService = {
             body: JSON.stringify({senderId})
         })
 
-        const data = await res.clone().json();
+        const data = await safelyParseJson(res);
 
         if(!res.ok) throw new Error("Failed to mark messages as read");
 
         return data;
     }
+}
+
+async function safelyParseJson(res: Response) {
+    const contentType = res.headers.get("content-type");
+    if (contentType?.includes("application/json")) {
+        return await res.json();
+    }
+    const text = await res.text();
+    throw new Error(`Server returned non-JSON response (Content-Type: ${contentType || 'unknown'}): ${text.substring(0, 100)}`);
 }

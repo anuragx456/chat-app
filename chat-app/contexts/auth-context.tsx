@@ -24,6 +24,7 @@ interface AuthContextType{
         password: string
     ) => Promise<string | null>;
     signOut: () => Promise<void>;
+    getCookie: () => string;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
     signIn: async () => null,
     signUp: async () => null,
     signOut: async () => { },
+    getCookie: () => "",
 })
 
 export function AuthProvider({children} : {children:React.ReactNode}){
@@ -93,10 +95,12 @@ export function AuthProvider({children} : {children:React.ReactNode}){
 
     const signOut = async() => {
         await authClient.signOut()
-    }
+    };
+
+    const getCookie = () => authClient.getCookie() ?? ""
 
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, signIn, signUp, signOut }}>
+        <AuthContext.Provider value={{ user, token, isLoading, signIn, signUp, signOut, getCookie }}>
             { children }
         </AuthContext.Provider>
     )

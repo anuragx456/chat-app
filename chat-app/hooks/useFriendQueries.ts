@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { friendService } from "../services/friend.services";
+import { friendService } from "../services/friend.service";
 
 export const USER_KEYS = {
   all: ["users"] as const,

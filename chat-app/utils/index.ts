@@ -1,1 +1,3 @@
-export const API_URL = "http://10.181.118.59:3000/api";
+export const API_URL = "http://10.27.174.129:3000/api";
+
+export const SOCKET_URL = "http://10.27.174.129:3000";
